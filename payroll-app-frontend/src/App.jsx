@@ -1,7 +1,7 @@
 // payroll-app-frontend/src/App.jsx
 import React, { useState, useEffect } from 'react';
 
-// --- COMPONENTES REUTILIZABLES Y MODALES ---
+// --- COMPONENTES MODALES ---
 
 const AddEmployeeModal = ({ isOpen, onClose, onEmployeeAdded }) => {
   const [employeeData, setEmployeeData] = useState({ nombres: '', apellidos: '', cedula: '', nss: '', id_empresa: 1 });
@@ -85,6 +85,8 @@ const PayrollDetailModal = ({ isOpen, onClose, payrollId }) => {
   );
 };
 
+
+// --- COMPONENTE: Lista de Empleados ---
 const EmployeeList = ({ onEmployeeSelect, refreshKey, onAssignContract }) => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -95,9 +97,10 @@ const EmployeeList = ({ onEmployeeSelect, refreshKey, onAssignContract }) => {
   }, [refreshKey]);
   if (loading) return <div className="mt-8 bg-white p-6 rounded-lg shadow-md text-center"><p className="text-gray-600">Cargando empleados...</p></div>;
   if (error) return <div className="mt-8 bg-red-100 p-6 rounded-lg shadow-md text-center"><p className="text-red-700">Error: {error}</p></div>;
-  return (<div className="mt-8 bg-white p-6 rounded-lg shadow-md"><div className="overflow-x-auto"><table className="min-w-full bg-white"><thead className="bg-gray-200"><tr><th className="text-left py-3 px-4">ID</th><th className="text-left py-3 px-4">Nombre Completo</th><th className="text-left py-3 px-4">Cédula</th><th className="text-left py-3 px-4">Estado</th><th className="text-center py-3 px-4">Acciones</th></tr></thead><tbody className="text-gray-700">{employees.length > 0 ? employees.map((employee) => (<tr key={employee.id_empleado} className="border-b hover:bg-blue-50"><td className="py-3 px-4 cursor-pointer" onClick={() => onEmployeeSelect(employee.id_empleado)}>{employee.id_empleado}</td><td className="py-3 px-4 cursor-pointer" onClick={() => onEmployeeSelect(employee.id_empleado)}>{employee.apellidos}, {employee.nombres}</td><td className="py-3 px-4 cursor-pointer" onClick={() => onEmployeeSelect(employee.id_empleado)}>{employee.cedula}</td><td className="py-3 px-4 cursor-pointer" onClick={() => onEmployeeSelect(employee.id_empleado)}><span className={`py-1 px-3 rounded-full text-xs ${employee.activo ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}>{employee.activo ? 'Activo' : 'Inactivo'}</span></td><td className="py-3 px-4 text-center"><button onClick={() => onAssignContract(employee.id_empleado)} className="text-sm bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-1 px-3 rounded">Asignar Contrato</button></td></tr>)) : <tr><td colSpan="5" className="text-center py-4">No hay empleados registrados.</td></tr>}</tbody></table></div></div>);
+  return (<div className="mt-8 bg-white p-6 rounded-lg shadow-md"><div className="overflow-x-auto"><table className="min-w-full bg-white"><thead className="bg-gray-200"><tr><th className="text-left py-3 px-4 uppercase font-semibold text-sm">ID</th><th className="text-left py-3 px-4 uppercase font-semibold text-sm">Nombre Completo</th><th className="text-left py-3 px-4 uppercase font-semibold text-sm">Cédula</th><th className="text-left py-3 px-4 uppercase font-semibold text-sm">Estado</th><th className="text-center py-3 px-4 uppercase font-semibold text-sm">Acciones</th></tr></thead><tbody className="text-gray-700">{employees.length > 0 ? employees.map((employee) => (<tr key={employee.id_empleado} className="border-b hover:bg-blue-50"><td className="py-3 px-4 cursor-pointer" onClick={() => onEmployeeSelect(employee.id_empleado)}>{employee.id_empleado}</td><td className="py-3 px-4 cursor-pointer" onClick={() => onEmployeeSelect(employee.id_empleado)}>{employee.apellidos}, {employee.nombres}</td><td className="py-3 px-4 cursor-pointer" onClick={() => onEmployeeSelect(employee.id_empleado)}>{employee.cedula}</td><td className="py-3 px-4 cursor-pointer" onClick={() => onEmployeeSelect(employee.id_empleado)}><span className={`py-1 px-3 rounded-full text-xs ${employee.activo ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}>{employee.activo ? 'Activo' : 'Inactivo'}</span></td><td className="py-3 px-4 text-center"><button onClick={() => onAssignContract(employee.id_empleado)} className="text-sm bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-1 px-3 rounded">Asignar Contrato</button></td></tr>)) : <tr><td colSpan="5" className="text-center py-4">No hay empleados registrados.</td></tr>}</tbody></table></div></div>);
 };
 
+// --- COMPONENTE: Calculadora de Liquidación ---
 const SettlementCalculator = ({ selectedContractId }) => {
   const [formData, setFormData] = useState({ contractId: '', causaTerminacion: 'Despido Injustificado', fechaTerminacion: new Date().toISOString().split('T')[0] });
   const [result, setResult] = useState(null);
@@ -110,6 +113,7 @@ const SettlementCalculator = ({ selectedContractId }) => {
   return ( <div className="mt-8 bg-white p-6 rounded-lg shadow-md"> <h3 className="text-2xl font-semibold text-gray-800 mb-4">Calculadora de Liquidación</h3> <form onSubmit={handleSubmit}> <div className="grid grid-cols-1 md:grid-cols-3 gap-6"> <div><label htmlFor="contractId" className="block text-sm font-medium">ID del Contrato</label><input type="number" name="contractId" value={formData.contractId} onChange={handleChange} className="mt-1 block w-full" required /></div><div><label htmlFor="causaTerminacion" className="block text-sm font-medium">Causa</label><select name="causaTerminacion" value={formData.causaTerminacion} onChange={handleChange} className="mt-1 block w-full"><option>Despido Injustificado</option><option>Renuncia Voluntaria</option></select></div><div><label htmlFor="fechaTerminacion" className="block text-sm font-medium">Fecha</label><input type="date" name="fechaTerminacion" value={formData.fechaTerminacion} onChange={handleChange} className="mt-1 block w-full" required /></div></div><div className="mt-6"><button type="submit" disabled={loading || !formData.contractId} className="w-full py-3 px-6 text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"> {loading ? 'Calculando...' : 'Calcular'}</button></div></form> {error && <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-md">{error}</div>} {result && <ResultDisplay data={result} />} </div> );
 };
 
+// --- COMPONENTE: Procesador de Planilla ---
 const PayrollProcessor = () => {
   const [periodo, setPeriodo] = useState({ desde: '2025-06-01', hasta: '2025-06-15' });
   const [loading, setLoading] = useState(false);
@@ -117,6 +121,45 @@ const PayrollProcessor = () => {
   const [error, setError] = useState('');
   const handleProcess = async () => { setLoading(true); setError(''); setResult(null); try { const response = await fetch('http://localhost:5000/api/payroll/process-full-payroll', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ empresaId: 1, periodoDesde: periodo.desde, periodoHasta: periodo.hasta, }), }); const data = await response.json(); if (!response.ok) throw new Error(data.message); setResult(data); } catch (err) { setError(err.message); } finally { setLoading(false); } };
   return ( <div className="bg-white p-6 rounded-lg shadow-md"> <h3 className="text-2xl font-semibold text-gray-800 mb-4">Procesar Planilla</h3> <div className="flex items-end gap-4"> <div><label htmlFor="periodoDesde" className="block text-sm font-medium text-gray-700">Desde</label><input type="date" id="periodoDesde" value={periodo.desde} onChange={e => setPeriodo({...periodo, desde: e.target.value})} className="mt-1 block w-full"/></div><div><label htmlFor="periodoHasta" className="block text-sm font-medium text-gray-700">Hasta</label><input type="date" id="periodoHasta" value={periodo.hasta} onChange={e => setPeriodo({...periodo, hasta: e.target.value})} className="mt-1 block w-full"/></div><button onClick={handleProcess} disabled={loading} className="py-2 px-6 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 disabled:opacity-50">{loading ? 'Procesando...' : 'Procesar'}</button> </div> {error && <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-md">{error}</div>} {result && ( <div className="mt-4 p-3 bg-blue-100 text-blue-800 rounded-md"> <p><strong>¡Éxito!</strong> {result.message}</p> <p>Planilla ID: {result.planillaId}, Neto a Pagar: B/. {result.netoAPagar}</p> </div> )} </div> );
+};
+
+// --- COMPONENTE DE PÁGINA: Detalle del Empleado ---
+const EmployeeDetailPage = ({ employeeId, onNavigate }) => {
+  const [employee, setEmployee] = useState(null);
+  const [contract, setContract] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editableData, setEditableData] = useState({});
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!employeeId) return; setLoading(true); setError('');
+      try {
+        const empResponse = await fetch(`http://localhost:5000/api/payroll/employees/${employeeId}`);
+        if (!empResponse.ok) throw new Error('No se pudo cargar la información del empleado.');
+        const empData = await empResponse.json();
+        setEmployee(empData);
+        setEditableData(empData);
+        try {
+          const contractResponse = await fetch(`http://localhost:5000/api/payroll/contracts/employee/${employeeId}`);
+          if (contractResponse.ok) { const contractData = await contractResponse.json(); setContract(contractData); } else { setContract(null); }
+        } catch (contractError) { setContract(null); }
+      } catch (err) { setError(err.message); } finally { setLoading(false); }
+    };
+    fetchData();
+  }, [employeeId]);
+  
+  const handleEditToggle = () => { setEditableData(employee); setIsEditing(!isEditing); setError(''); };
+  const handleChange = (e) => { const { name, value, type, checked } = e.target; setEditableData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value })); };
+  const handleSave = async () => { setLoading(true); setError(''); try { const response = await fetch(`http://localhost:5000/api/payroll/employees/${employeeId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(editableData) }); const updatedEmployee = await response.json(); if (!response.ok) throw new Error(updatedEmployee.message || 'Error al guardar.'); setEmployee(updatedEmployee); setIsEditing(false); } catch (err) { setError(err.message); } finally { setLoading(false); } };
+  const formatDate = (dateString) => new Date(dateString).toLocaleDateString('es-PA');
+  
+  if (loading) return <div className="text-center p-8">Cargando detalles...</div>;
+  if (error) return <div className="text-center p-8 text-red-600">Error: {error}</div>;
+  if (!employee) return null;
+
+  return (<> <div className="flex justify-between items-center mb-6"> <h2 className="text-3xl font-semibold">Detalle: {employee.nombres} {employee.apellidos}</h2> <div> {isEditing ? (<div className="flex gap-2"><button onClick={handleSave} disabled={loading} className="bg-green-500 text-white py-2 px-4 rounded">{loading ? 'Guardando...' : 'Guardar'}</button><button onClick={handleEditToggle} className="bg-gray-500 text-white py-2 px-4 rounded">Cancelar</button></div>) : (<button onClick={handleEditToggle} className="bg-blue-500 text-white py-2 px-4 rounded">Editar</button>)} </div> </div> <div className="bg-white p-6 rounded-lg shadow-md mb-8"><h3>Información Personal</h3> <div className="grid grid-cols-3 gap-6"> <div><p>Nombres</p>{isEditing ? <input name="nombres" value={editableData.nombres || ''} onChange={handleChange}/> : <p>{employee.nombres}</p>}</div><div><p>Apellidos</p>{isEditing ? <input name="apellidos" value={editableData.apellidos || ''} onChange={handleChange}/> : <p>{employee.apellidos}</p>}</div><div><p>Cédula</p>{isEditing ? <input name="cedula" value={editableData.cedula || ''} onChange={handleChange}/> : <p>{employee.cedula}</p>}</div><div><p>NSS</p>{isEditing ? <input name="nss" value={editableData.nss || ''} onChange={handleChange}/> : <p>{employee.nss || 'N/A'}</p>}</div><div><p>Estado</p>{isEditing ? <input type="checkbox" name="activo" checked={editableData.activo} onChange={handleChange}/> : <p>{employee.activo ? 'Activo' : 'Inactivo'}</p>}</div></div></div><div className="bg-white p-6 rounded-lg shadow-md"><h3>Contrato Activo</h3> {contract ? (<div><p>Cargo: {contract.cargo}</p><p>Salario: B/. {parseFloat(contract.salario_base).toFixed(2)}</p></div>) : (<p>No tiene contrato activo.</p>)} </div> </>);
 };
 
 
@@ -129,13 +172,20 @@ const PayrollHistoryPage = ({ onRowClick }) => {
     const [error, setError] = useState('');
     useEffect(() => { const fetchHistory = async () => { setLoading(true); try { const response = await fetch('http://localhost:5000/api/payroll/payrolls'); if (!response.ok) throw new Error('No se pudo obtener el historial.'); const data = await response.json(); setHistory(data); } catch (err) { setError(err.message); } finally { setLoading(false); }}; fetchHistory(); }, []);
     const formatDate = (dateString) => new Date(dateString).toLocaleDateString('es-PA');
-    return (<> <div className="flex justify-between items-center mb-6"> <h2 className="text-3xl font-semibold text-gray-800">Historial de Planillas</h2> </div> <div className="bg-white p-6 rounded-lg shadow-md"> {loading && <p>Cargando...</p>} {error && <p>{error}</p>} {!loading && !error && (<div className="overflow-x-auto"><table className="min-w-full"><thead><tr><th>ID</th><th>Período</th><th>Neto a Pagar</th><th>Estado</th></tr></thead><tbody>{history.length > 0 ? history.map(item => (<tr key={item.id_planilla} className="hover:bg-blue-50 cursor-pointer" onClick={() => onRowClick(item.id_planilla)}><td>{item.id_planilla}</td><td>{formatDate(item.periodo_planilla_desde)} - {formatDate(item.periodo_planilla_hasta)}</td><td className="text-right font-bold">B/. {parseFloat(item.neto_a_pagar).toFixed(2)}</td><td className="text-center"><span className="py-1 px-3 rounded-full text-xs bg-yellow-200 text-yellow-800">{item.estado_planilla}</span></td></tr>)) : <tr><td colSpan="4" className="text-center py-4">No hay planillas procesadas.</td></tr>}</tbody></table></div>)} </div> </>);
+    return (<> <div className="flex justify-between items-center mb-6"> <h2 className="text-3xl font-semibold text-gray-800">Historial de Planillas</h2> </div> <div className="bg-white p-6 rounded-lg shadow-md"> {loading && <p className="text-center p-4">Cargando...</p>} {error && <p className="text-center p-4 text-red-500">{error}</p>} {!loading && !error && (<div className="overflow-x-auto"><table className="min-w-full"><thead><tr><th className="text-left p-2">ID</th><th className="text-left p-2">Período</th><th className="text-right p-2">Neto a Pagar</th><th className="text-center p-2">Estado</th></tr></thead><tbody>{history.length > 0 ? history.map(item => (<tr key={item.id_planilla} className="hover:bg-blue-50 cursor-pointer border-t" onClick={() => onRowClick(item.id_planilla)}><td className="p-2">{item.id_planilla}</td><td className="p-2">{formatDate(item.periodo_planilla_desde)} - {formatDate(item.periodo_planilla_hasta)}</td><td className="text-right p-2 font-bold">B/. {parseFloat(item.neto_a_pagar).toFixed(2)}</td><td className="text-center p-2"><span className="py-1 px-3 rounded-full text-xs bg-yellow-200 text-yellow-800">{item.estado_planilla}</span></td></tr>)) : <tr><td colSpan="4" className="text-center py-4">No hay planillas procesadas.</td></tr>}</tbody></table></div>)} </div> </>);
+};
+const ReportsPage = () => {
+    const [summary, setSummary] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    useEffect(() => { const fetchSummary = async () => { setLoading(true); try { const response = await fetch('http://localhost:5000/api/payroll/reports/monthly-summary'); if (!response.ok) throw new Error('No se pudo cargar el resumen mensual.'); const data = await response.json(); setSummary(data); } catch (err) { setError(err.message); } finally { setLoading(false); }}; fetchSummary(); }, []);
+    return (<> <div className="flex justify-between items-center mb-6"> <h2 className="text-3xl font-semibold text-gray-800">Reportes</h2> </div> <div className="bg-white p-6 rounded-lg shadow-md"> <h3 className="text-xl font-semibold text-gray-700 mb-4">Resumen de Costos por Mes</h3> {loading && <p className="text-center">Cargando reporte...</p>} {error && <p className="text-center text-red-600">Error: {error}</p>} {!loading && !error && (<div className="overflow-x-auto"><table className="min-w-full bg-white"><thead className="bg-gray-200"><tr><th className="text-left py-3 px-4">Mes</th><th className="text-right py-3 px-4">Total Ingresos</th><th className="text-right py-3 px-4">Total Deducciones</th><th className="text-right py-3 px-4">Neto Pagado</th></tr></thead><tbody className="text-gray-700">{summary.map(item => (<tr key={item.mes} className="border-b border-gray-200 hover:bg-gray-100"><td className="py-3 px-4">{item.mes}</td><td className="text-right py-3 px-4">B/. {parseFloat(item.total_ingresos_mes).toFixed(2)}</td><td className="text-right py-3 px-4">B/. {parseFloat(item.total_deducciones_mes).toFixed(2)}</td><td className="text-right py-3 px-4 font-bold">B/. {parseFloat(item.neto_a_pagar_mes).toFixed(2)}</td></tr>))}</tbody></table></div>)} </div> </>);
 };
 
 
 // --- COMPONENTES ESTRUCTURALES ---
 const Navbar = () => ( <nav className="bg-blue-600 text-white p-4 shadow-md"><div className="container mx-auto flex justify-between items-center"><h1 className="text-2xl font-bold">PlanillaMaestra SaaS</h1><div><button className="bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">Iniciar Sesión</button></div></div></nav> );
-const Sidebar = ({ currentPage, onNavigate }) => ( <aside className="w-64 bg-gray-100 p-4 space-y-4 hidden md:block rounded-lg shadow"><h2 className="text-xl font-semibold text-gray-700 mb-3">Menú Principal</h2><ul className="space-y-2"><li><a href="#" onClick={(e) => { e.preventDefault(); onNavigate('dashboard'); }} className={`block py-2 px-3 rounded-md transition duration-150 ${currentPage === 'dashboard' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-blue-100'}`}>Dashboard</a></li><li><a href="#" onClick={(e) => { e.preventDefault(); onNavigate('employees'); }} className={`block py-2 px-3 rounded-md transition duration-150 ${currentPage === 'employees' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-blue-100'}`}>Empleados</a></li><li><a href="#" onClick={(e) => { e.preventDefault(); onNavigate('history'); }} className={`block py-2 px-3 rounded-md transition duration-150 ${currentPage === 'history' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-blue-100'}`}>Historial</a></li></ul></aside> );
+const Sidebar = ({ currentPage, onNavigate }) => ( <aside className="w-64 bg-gray-100 p-4 space-y-4 hidden md:block rounded-lg shadow"><h2 className="text-xl font-semibold text-gray-700 mb-3">Menú Principal</h2><ul className="space-y-2"><li><a href="#" onClick={(e) => { e.preventDefault(); onNavigate('dashboard'); }} className={`block py-2 px-3 rounded-md transition duration-150 ${currentPage === 'dashboard' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-blue-100'}`}>Dashboard</a></li><li><a href="#" onClick={(e) => { e.preventDefault(); onNavigate('employees'); }} className={`block py-2 px-3 rounded-md transition duration-150 ${currentPage === 'employees' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-blue-100'}`}>Empleados</a></li><li><a href="#" onClick={(e) => { e.preventDefault(); onNavigate('history'); }} className={`block py-2 px-3 rounded-md transition duration-150 ${currentPage === 'history' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-blue-100'}`}>Historial</a></li><li><a href="#" onClick={(e) => { e.preventDefault(); onNavigate('reports'); }} className={`block py-2 px-3 rounded-md transition duration-150 ${currentPage === 'reports' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-blue-100'}`}>Reportes</a></li></ul></aside> );
 const Footer = () => ( <footer className="bg-gray-800 text-gray-300 p-4 mt-auto"><div className="container mx-auto text-center"><p>&copy; {new Date().getFullYear()} PlanillaMaestra SaaS. Todos los derechos reservados.</p><p>Desarrollado con ❤️ en Panamá</p></div></footer> );
 
 const MainContent = ({ page, ...props }) => {
@@ -143,6 +193,8 @@ const MainContent = ({ page, ...props }) => {
     switch (page) {
       case 'employees': return <EmployeesPage {...props} />;
       case 'history': return <PayrollHistoryPage {...props} />;
+      case 'reports': return <ReportsPage {...props} />;
+      case 'employeeDetail': return <EmployeeDetailPage {...props} />;
       case 'dashboard': default: return <DashboardPage {...props} />;
     }
   };
@@ -153,6 +205,7 @@ const MainContent = ({ page, ...props }) => {
 function App() {
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [selectedContractId, setSelectedContractId] = useState('');
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
   const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
   const [isContractModalOpen, setIsContractModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -160,8 +213,8 @@ function App() {
   const [selectedPayrollId, setSelectedPayrollId] = useState(null);
   const [employeeRefreshKey, setEmployeeRefreshKey] = useState(0);
 
-  const handleNavigate = (page) => setCurrentPage(page);
-  const handleEmployeeSelect = (contractId) => { setSelectedContractId(contractId); setCurrentPage('dashboard'); };
+  const handleNavigate = (page) => { setCurrentPage(page); setSelectedEmployeeId(null); };
+  const handleEmployeeSelect = (employeeId) => { setSelectedEmployeeId(employeeId); setCurrentPage('employeeDetail'); };
   const handleEmployeeAdded = () => { setIsEmployeeModalOpen(false); setEmployeeRefreshKey(prevKey => prevKey + 1); };
   const handleOpenContractModal = (employeeId) => { setEmployeeIdForContract(employeeId); setIsContractModalOpen(true); };
   const handleContractAdded = () => { setIsContractModalOpen(false); };
@@ -179,11 +232,13 @@ function App() {
         <MainContent 
           page={currentPage}
           selectedContractId={selectedContractId}
-          handleEmployeeSelect={handleEmployeeSelect}
+          onEmployeeSelect={handleEmployeeSelect} // <-- CORRECCIÓN
           openAddEmployeeModal={() => setIsEmployeeModalOpen(true)}
           employeeRefreshKey={employeeRefreshKey}
           openAddContractModal={handleOpenContractModal}
           onRowClick={handleHistoryRowClick}
+          employeeId={selectedEmployeeId}
+          onNavigate={handleNavigate}
         />
       </div>
       <Footer />
@@ -192,4 +247,3 @@ function App() {
 }
 
 export default App;
-
