@@ -1,2 +1,0 @@
-# planilla
-App de Planilla
